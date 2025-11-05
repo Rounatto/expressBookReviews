@@ -3,29 +3,16 @@ const jwt = require('jsonwebtoken');
 let books = require("./booksdb.js");
 const regd_users = express.Router();
 
-// Registered users will be stored here
 let users = [];
 
-/**
- * Check if username is valid (not already registered)
- * @param {string} username
- * @returns {boolean}
- */
 const isValid = (username) => {
     for (let user of users) {
         if (user.username === username) {
-            return false; // username déjà pris
+            return false; 
         }
     }
-    return true; // username disponible
+    return true; 
 };
-
-/**
- * Check if username and password match
- * @param {string} username
- * @param {string} password
- * @returns {boolean}
- */
 const authenticatedUser = (username, password) => {
     for (let user of users) {
         if (user.username === username && user.password === password) {
@@ -35,10 +22,6 @@ const authenticatedUser = (username, password) => {
     return false;
 };
 
-
-// ============================
-// USER REGISTRATION
-// ============================
 regd_users.post("/register", (req, res) => {
     const { username, password } = req.body;
 
@@ -54,9 +37,6 @@ regd_users.post("/register", (req, res) => {
     return res.status(200).json({ message: "User registered successfully" });
 });
 
-// ============================
-// USER LOGIN
-// ============================
 regd_users.post("/login", (req, res) => {
     const { username, password } = req.body;
 
@@ -64,7 +44,6 @@ regd_users.post("/login", (req, res) => {
         return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    // Create JWT token and store in session
     let accessToken = jwt.sign({ username: username }, "access", { expiresIn: "1h" });
     req.session.authorization = { accessToken, username };
 
@@ -74,9 +53,6 @@ regd_users.post("/login", (req, res) => {
     });
 });
 
-// ============================
-// ADD or UPDATE REVIEW
-// ============================
 regd_users.put("/auth/review/:isbn", (req, res) => {
     const isbn = req.params.isbn;
     const review = req.body.review;
@@ -94,7 +70,6 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
         return res.status(400).json({ message: "Review content is required" });
     }
 
-    // Create reviews object if it doesn't exist
     if (!books[isbn].reviews) {
         books[isbn].reviews = {};
     }
@@ -103,9 +78,6 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     return res.status(200).json({ message: "Review added/updated successfully" });
 });
 
-// ============================
-// DELETE REVIEW
-// ============================
 regd_users.delete("/auth/review/:isbn", (req, res) => {
     const isbn = req.params.isbn;
     const username = req.session.authorization?.username;
@@ -126,7 +98,6 @@ regd_users.delete("/auth/review/:isbn", (req, res) => {
     }
 });
 
-// Export functions and router
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
 module.exports.users = users;
