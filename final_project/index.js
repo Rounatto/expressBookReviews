@@ -8,14 +8,12 @@ const app = express();
 
 app.use(express.json());
 
-// Session middleware
 app.use("/customer", session({
   secret: "fingerprint_customer",
   resave: true,
   saveUninitialized: true
 }));
 
-// Authentication middleware
 app.use("/customer/auth/*", function auth(req, res, next) {
   const sessionAuth = req.session.authorization;
 
